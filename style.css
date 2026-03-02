@@ -2,10 +2,12 @@ body {
     display: flex;
     justify-content: center;
     background-color: rgb(129, 129, 129);
+    font-size: 50px;
 }
 
 .container {
-    width: 30vw;
+    /* width: 30vw; */
+
     border-style: solid;
     padding: 25px;
     background: rgb(47, 47, 47);
@@ -20,33 +22,57 @@ body {
     align-items: center;
     height: 60px;
     margin-bottom: 20px;
-    padding: 10px;
+    
     background-color: rgb(232, 233, 223);
-    border-left: solid 3px rgb(195, 195, 195);
-    border-top: solid 4px rgb(152, 152, 152);
-    border-right: solid 2px white;
-    border-bottom: solid 2px rgb(229, 229, 229);
-    font-size: 60px;
+    border: 4px inset rgb(226, 225, 225);
+    
+    padding: 10px;
     font-family: Arial, Helvetica, sans-serif;
     color: rgb(32, 36, 32);
 }
 
 .buttons {
+    width: 400px;
+    height: 500px;
+    display: flex;
+    /* aspect-ratio: 1 / 1; */
+}
+
+.left .controls {
+    display: flex;
+    justify-content: center;
+}
+
+.left .numpad {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    align-content: space-between;
-    aspect-ratio: 1 / 1;
+    align-items: space-between;
+
+}
+
+.controls button {
+    flex: 1;
+    /* border-radius: 15px; */
+    aspect-ratio: unset;
+}
+
+.right .operators {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 button {
-    border-radius: 30%;
-    width: 80px;
-    aspect-ratio: 1 / 1;
-    font-size: 30px;
+    box-sizing: border-box;
+    width: 100px;
+    height: 100px;
+    
+    border-color: rgb(225, 220, 220);
+
+    font-size: .8em;
     font-weight: 500;
     color: white;
-    border-color: rgb(225, 220, 220);
 }
 
 .number {
@@ -57,7 +83,7 @@ button {
     background-color: orange;
 }
 
-.equals {
+#equals {
     color: black;
     background-color: rgb(219, 218, 218);
 }
