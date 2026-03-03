@@ -75,15 +75,19 @@ button {
     color: white;
 }
 
-.number {
+.numpad button {
     background-color: rgb(171, 171, 171);
 }
 
-.operator {
+.controls button {
+    background-color: rgb(136, 136, 136);
+}
+
+.operators button {
     background-color: orange;
 }
 
 #equals {
-    color: black;
-    background-color: rgb(219, 218, 218);
+    /* color: black; */
+    background-color: rgb(85, 85, 85);
 }
