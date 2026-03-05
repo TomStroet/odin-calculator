@@ -7,7 +7,6 @@ const equalsBtn = document.querySelector('#equals')
 
 let operator = ''
 let inputString = ''
-// let step = 0
 let values = []
 
 let operations = {
@@ -19,7 +18,6 @@ let operations = {
 
 function init() {
     values = []
-    // step = 0
     operator = ''
     inputString = ''
     refreshDisplay(inputString)
@@ -39,43 +37,40 @@ function refreshDisplay(string) {
 function pressNumberButton(buttonString) {
     inputString += buttonString;
     refreshDisplay(inputString)
-    inputFloat = parseFloat(inputString)
-
+     
     let i = 0;
     if (operator != '') {
         i = 1;
     }
-    values[i] = inputFloat
+    values[i] = parseFloat(inputString)
 
     log()
 }
-
+// NOT WORKING YET.
+// function pressBackspaceButton() {
+//     inputString = inputString.substring(0,inputString.length -1);
+//     refreshDisplay(inputString);
+//     log()
+// }
 
 function pressOperatorButton(operatorString) {
-    if (values.length == 1) {
-        // if values contains only one value, then set the operator and clear the inputstring so it is ready for the second number input.
-        operator = operatorString;
-        inputString = ''
-    } else if (values.length == 2) {
-        // If there are two inputs, then do the operation, then set the result as values[0], set the operator and clear the inputstring. 
-        result = operate()
-        values = [result]
-        operator = operatorString
-        inputString = ''
+    // If there are two inputs, then do the operation before setting the operator and clearing the inputstring.
+    if (values.length == 2) {
+        operate()
     }
-
+    operator = operatorString
+    inputString = ''
     log()
 }
 
 function operate() {
-    result = values.reduce(operations[operator])
-    refreshDisplay(result)
-    values = [result]
-    operator = ''
-    inputString = ''
-
+    if (values.length == 2 && operator != '') {
+        result = values.reduce(operations[operator])
+        init()
+        values = [result]
+        refreshDisplay(result)
+    }
     log()
-    return result
 }
 
 
@@ -95,7 +90,4 @@ equalsBtn.addEventListener('click', () => operate())
 
 clearBtn.addEventListener('click', () => init())
 
-backspaceBtn.addEventListener('click', () => {
-    displayValue = displayValue.substring(0,displayValue.length -1);
-    refreshDisplay(displayValue);
-})
+backspaceBtn.addEventListener('click', () => pressBackspaceButton())
