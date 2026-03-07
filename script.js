@@ -11,9 +11,9 @@ const equalsBtn = document.querySelector('#equals')
 const state = {
     display: '',
     operator: '',
-    leftNum: null,
-    rightNum: null,
-    result: null
+    leftNum: '',
+    rightNum: '',
+    result: ''
 }
 
 
@@ -28,25 +28,35 @@ const operations = {
 
 // App logic
 function pressNumberButton(state, buttonString) {
+    // Pressing a number after an operation starts in a fresh state.
     if (state.result) {
-        state.display = '';
-        state.result = null;
+        init(state);
     }
-    state.display += buttonString;
+
+    // Select which number to record and display: left or right.
+    if (!state.operator) {
+        state.leftNum += buttonString;
+        state.display = state.leftNum
+    } else {
+        state.rightNum += buttonString;
+        state.display = state.rightNum;
+    }
     logState()
 }
 
 function pressOperatorButton(state, operator) {
-    if (!state.leftNum && state.display) {
-        state.leftNum = parseFloat(state.display);
-        state.display = '';
+    // Press operator after number->operator->number: first operate
+    if (state.leftNum && state.operator && state.rightNum) {
+        operate(state, operations);
     }
-    if (state.leftNum && state.operator && state.display) {
-        operate(state, operations)
-    }
+
+    // If there is a result (from equal-button or operator-button), then move result to leftNum.
     if (state.result) {
         state.leftNum = state.result;
+        state.result = '';
     }
+
+    // Set the operator when a leftNum is present.
     if (state.leftNum) {
         state.operator = operator;
     }
@@ -54,15 +64,18 @@ function pressOperatorButton(state, operator) {
 }
 
 function operate(state, operations) {
-    if (state.leftNum && state.operator && state.display) {
-        state.rightNum = parseFloat(state.display);
+    if (state.leftNum && state.operator && state.rightNum) {
+        // Choose operator function and run operation. Write result string to result.
+        const operatorFn = operations[state.operator];
+        state.result = operatorFn(parseFloat(state.leftNum), parseFloat(state.rightNum)).toString();
+
         logState()
-        state.result = operations[state.operator](state.leftNum, state.rightNum)
-        state.leftNum = null
-        state.rightNum = null
+        // Write result to display and clear other variables.
+        state.display = state.result
+        state.leftNum = ''
+        state.rightNum = ''
         state.operator = ''
         logState()
-        state.display = state.result
     }
     logState()
 }
@@ -70,7 +83,7 @@ function operate(state, operations) {
 
 // UI/render functions
 function render() {
-    display.textContent = state.display;
+    display.textContent = state.display  ;
 }
 
 function logState() {
@@ -89,9 +102,7 @@ numpad.forEach((button) =>
 operators.forEach((button) =>
     button.addEventListener('click', (e) => {
         pressOperatorButton(state, e.target.id);
-        if (state.result) {
-            render();
-        }
+        render();
     })
 );
 
@@ -106,11 +117,12 @@ backspaceBtn.addEventListener('click', () => pressBackspaceButton())
 
 
 // Initialization
-function init() {
-    values = []
-    operator = ''
-    inputString = ''
-    refreshDisplay(inputString)
+function init(state) {
+    state.leftNum = '';
+    state.rightNum = '';
+    state.operator = '';
+    state.display = '';
+    state.result = '';
 }
 
 
