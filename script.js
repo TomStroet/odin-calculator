@@ -45,11 +45,6 @@ function pressNumberButton(state, buttonString) {
 }
 
 function pressOperatorButton(state, operator) {
-    // Press operator after number->operator->number: first operate
-    if (state.leftNum && state.operator && state.rightNum) {
-        operate(state, operations);
-    }
-
     // If there is a result (from equal-button or operator-button), then move result to leftNum.
     if (state.result) {
         state.leftNum = state.result;
@@ -65,7 +60,7 @@ function pressOperatorButton(state, operator) {
 
 function operate(state, operations) {
     if (state.leftNum && state.operator && state.rightNum) {
-        // Choose operator function and run operation. Write result string to result.
+        // Choose operator function and run operation. Write result string to state.result.
         const operatorFn = operations[state.operator];
         state.result = operatorFn(parseFloat(state.leftNum), parseFloat(state.rightNum)).toString();
 
@@ -101,6 +96,7 @@ numpad.forEach((button) =>
 
 operators.forEach((button) =>
     button.addEventListener('click', (e) => {
+        operate(state, operations);
         pressOperatorButton(state, e.target.id);
         render();
     })
@@ -111,9 +107,12 @@ equalsBtn.addEventListener('click', () => {
     render()
 })
 
-clearBtn.addEventListener('click', () => init())
+clearBtn.addEventListener('click', () => {
+    init(state)
+    render()
+});
 
-backspaceBtn.addEventListener('click', () => pressBackspaceButton())
+// backspaceBtn.addEventListener('click', () => pressBackspaceButton())
 
 
 // Initialization
