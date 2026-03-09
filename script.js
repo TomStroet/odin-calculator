@@ -33,15 +33,10 @@ function pressNumberButton(state, buttonString) {
         init(state);
     }
 
-    // Select which number to record and display: left or right.
-    if (!state.operator) {
-        state.leftNum += buttonString;
-        state.display = state.leftNum
-    } else {
-        state.rightNum += buttonString;
-        state.display = state.rightNum;
-    }
-    logState()
+    // Select target (leftNum, rightNum), append buttonString and update state.display
+    const target = state.operator ? 'rightNum' : 'leftNum';
+    state[target] += buttonString;
+    state.display = state[target];
 }
 
 function pressOperatorButton(state, operator) {
