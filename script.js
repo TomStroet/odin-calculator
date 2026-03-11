@@ -2,7 +2,7 @@
 const display = document.querySelector('.display')
 const clearBtn = document.querySelector('#clear')
 const backspaceBtn = document.querySelector('#backspace')
-const numpad = document.querySelectorAll('.numpad button:not(#plusMinus)')
+const numpad = document.querySelector('.numpad')
 const operators = document.querySelectorAll('.operators button');
 const equalsBtn = document.querySelector('#equals')
 
@@ -33,15 +33,27 @@ function pressNumberButton(state, buttonString) {
         init(state);
     }
 
-    // Select target (leftNum, rightNum), append buttonString and update state.display
+    // Select target (leftNum, rightNum), append buttonString if target string is not too long, and update state.display
     const target = state.operator ? 'rightNum' : 'leftNum';
-    state[target] += buttonString;
+    if (state[target].length < 9) {
+        state[target] += buttonString;
+    }
     state.display = state[target];
+
+    logState()
+}
+
+
+function pressBackspaceButton(state) {
+    const target = state.operator ? 'rightNum' : 'leftNum';
+    state[target] = state[target].substring(0,state[target].length -1);
+    state.display = state[target];
+    logState()
 }
 
 function pressOperatorButton(state, operator) {
-    // If there is a result (from equal-button or operator-button), then move result to leftNum.
-    if (state.result) {
+    // If there is a valid result (from equal-button or operator-button), then move result to leftNum.
+    if (state.result && state.result !== 'div/0') {
         state.leftNum = state.result;
         state.result = '';
     }
@@ -55,12 +67,19 @@ function pressOperatorButton(state, operator) {
 
 function operate(state, operations) {
     if (state.leftNum && state.operator && state.rightNum) {
-        // Choose operator function and run operation. Write result string to state.result.
-        const operatorFn = operations[state.operator];
-        state.result = operatorFn(parseFloat(state.leftNum), parseFloat(state.rightNum)).toString();
-
+        // Check for divide-by-0. Else, choose operator function and run operation. Write result string to state.result.
+        if (state.operator === 'divide' && state.rightNum === '0') {
+            state.result = 'div/0';
+        } else {
+            const operatorFn = operations[state.operator];
+            state.result = operatorFn(parseFloat(state.leftNum), parseFloat(state.rightNum)).toString();
+        }
+        
         logState()
-        // Write result to display and clear other variables.
+        // Limit number of digits, then write result to display and clear other variables.
+        if (state.result.length > 9) {
+            state.result = state.result.slice(0, 9) + '...'            
+        }
         state.display = state.result
         state.leftNum = ''
         state.rightNum = ''
@@ -82,12 +101,12 @@ function logState() {
 
 
 // Event handlers
-numpad.forEach((button) => 
-    button.addEventListener('click', () => {
-        pressNumberButton(state, button.textContent);
-        render();
-    })
-);
+// numpad.forEach((button) => 
+//     button.addEventListener('click', () => {
+//         pressNumberButton(state, button.textContent);
+//         render();
+//     })
+// );
 
 operators.forEach((button) =>
     button.addEventListener('click', (e) => {
@@ -107,7 +126,17 @@ clearBtn.addEventListener('click', () => {
     render()
 });
 
-// backspaceBtn.addEventListener('click', () => pressBackspaceButton())
+backspaceBtn.addEventListener('click', () => {
+    pressBackspaceButton(state);
+    render();
+});
+
+numpad.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    pressNumberButton(state, btn.textContent);
+    render();
+}); 
 
 
 // Initialization
@@ -120,11 +149,6 @@ function init(state) {
 }
 
 
-// NOT WORKING YET.
-// function pressBackspaceButton() {
-//     inputString = inputString.substring(0,inputString.length -1);
-//     refreshDisplay(inputString);
-//     log()
-// }
+
 
 logState()
