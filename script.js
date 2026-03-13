@@ -27,19 +27,37 @@ const operations = {
 
 
 // App logic
-function pressNumberButton(state, buttonString) {
-    // Pressing a number after an operation starts in a fresh state.
-    if (state.result) {
-        init(state);
-    }
+function setNumberTarget() {
+    return state.operator ? 'rightNum' : 'leftNum';
+}
 
-    // Select target (leftNum, rightNum), append buttonString if target string is not too long, and update state.display
-    const target = state.operator ? 'rightNum' : 'leftNum';
-    if (state[target].length < 9) {
-        state[target] += buttonString;
+function pressNumpadButton(type, value) {
+    logState()
+    const target = setNumberTarget();
+    console.log(type)
+    console.log(value)
+    console.log(target)
+    switch (type) {
+        case 'digit': 
+            // Pressing a digit after an operation starts in a fresh state.
+            if (state.result) {
+                init(state);
+            }
+        
+            // Select target (leftNum, rightNum), append buttonString if target string is not too long, and update state.display
+            if (state[target].length < 9) {
+                state[target] += value;
+            }
+            break;
+
+        case 'sign':
+            state[target] = (0 - Number(state[target])).toString()
+            break;
+
+        case 'decimal': 
+            break;
     }
     state.display = state[target];
-
     logState()
 }
 
@@ -72,7 +90,7 @@ function operate(state, operations) {
             state.result = 'div/0';
         } else {
             const operatorFn = operations[state.operator];
-            state.result = operatorFn(parseFloat(state.leftNum), parseFloat(state.rightNum)).toString();
+            state.result = operatorFn(Number(state.leftNum), Number(state.rightNum)).toString();
         }
         
         logState()
@@ -101,12 +119,14 @@ function logState() {
 
 
 // Event handlers
-// numpad.forEach((button) => 
-//     button.addEventListener('click', () => {
-//         pressNumberButton(state, button.textContent);
-//         render();
-//     })
-// );
+numpad.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+
+    const {type, value} = btn.dataset;
+    pressNumpadButton(type, value);
+    render();
+});
 
 operators.forEach((button) =>
     button.addEventListener('click', (e) => {
@@ -131,14 +151,6 @@ backspaceBtn.addEventListener('click', () => {
     render();
 });
 
-numpad.addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if (!btn) return;
-    pressNumberButton(state, btn.textContent);
-    render();
-}); 
-
-
 // Initialization
 function init(state) {
     state.leftNum = '';
@@ -147,8 +159,5 @@ function init(state) {
     state.display = '';
     state.result = '';
 }
-
-
-
 
 logState()
