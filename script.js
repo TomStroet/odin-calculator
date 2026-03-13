@@ -2,10 +2,7 @@
 const display = document.querySelector('.display')
 const numpad = document.querySelector('.numpad')
 const operators = document.querySelector('.operators');
-const clearBtn = document.querySelector('#clear')
-const backspaceBtn = document.querySelector('#backspace')
-// const equalsBtn = document.querySelector('#equals')
-
+const controls = document.querySelector('.controls')
 
 // State
 const state = {
@@ -16,7 +13,6 @@ const state = {
     result: ''
 }
 
-
 // Utility functions
 const operations = {
     add:      (a, b) =>  a + b,
@@ -25,18 +21,13 @@ const operations = {
     divide:   (a, b) =>  a / b,
 }
 
-
 // App logic
 function setNumberTarget() {
     return state.operator ? 'rightNum' : 'leftNum';
 }
 
 function pressNumpadButton(type, value) {
-    logState()
     const target = setNumberTarget();
-    console.log(type)
-    console.log(value)
-    console.log(target)
     switch (type) {
         case 'digit': 
             // Pressing a digit after an operation starts in a fresh state.
@@ -58,18 +49,16 @@ function pressNumpadButton(type, value) {
             break;
     }
     state.display = state[target];
-    logState()
 }
 
 
-function pressBackspaceButton(state) {
-    const target = state.operator ? 'rightNum' : 'leftNum';
+function pressBackspaceButton() {
+    const target = setNumberTarget();
     state[target] = state[target].substring(0,state[target].length -1);
     state.display = state[target];
-    logState()
 }
 
-function pressOperatorButton(state, operator) {
+function pressOperatorButton(operator) {
     // If there is a valid result (from equal-button or operator-button), then move result to leftNum.
     if (state.result && state.result !== 'div/0') {
         state.leftNum = state.result;
@@ -80,10 +69,9 @@ function pressOperatorButton(state, operator) {
     if (state.leftNum) {
         state.operator = operator;
     }
-    logState()
 }
 
-function operate(state, operations) {
+function operate() {
     if (state.leftNum && state.operator && state.rightNum) {
         // Check for divide-by-0. Else, choose operator function and run operation. Write result string to state.result.
         if (state.operator === 'divide' && state.rightNum === '0') {
@@ -93,7 +81,6 @@ function operate(state, operations) {
             state.result = String(operatorFn(Number(state.leftNum), Number(state.rightNum)));
         }
         
-        logState()
         // Limit number of digits, then write result to display and clear other variables.
         if (state.result.length > 9) {
             state.result = state.result.slice(0, 9) + '...'            
@@ -102,21 +89,18 @@ function operate(state, operations) {
         state.leftNum = ''
         state.rightNum = ''
         state.operator = ''
-        logState()
     }
-    logState()
 }
 
 
 // UI/render functions
 function render() {
-    display.textContent = state.display  ;
+    display.textContent = state.display;
 }
 
 function logState() {
     console.log(state)
 }
-
 
 // Event handlers
 numpad.addEventListener('click', (e) => {
@@ -131,47 +115,36 @@ numpad.addEventListener('click', (e) => {
 operators.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
-
+    
     operate();
-    const operator = btn.dataset;
+    const operator = btn.dataset.type;
     if (operator != 'operate') {
         pressOperatorButton(operator);
     }
     render();
 })
 
+controls.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
 
-// operators.forEach((button) =>
-//     button.addEventListener('click', (e) => {
-        
-//         operate(state, operations);
-//         pressOperatorButton(state, e.target.id);
-//         render();
-//     })
-// );
-
-// equalsBtn.addEventListener('click', () => {
-//     operate(state, operations)
-//     render()
-// })
-
-clearBtn.addEventListener('click', () => {
-    init(state)
-    render()
-});
-
-backspaceBtn.addEventListener('click', () => {
-    pressBackspaceButton(state);
+    const control = btn.dataset.type;
+    switch (control) {
+        case 'backspace':
+            pressBackspaceButton();
+            break;
+        case 'clear':
+            init();
+            break;    
+    } 
     render();
-});
+})
 
 // Initialization
-function init(state) {
+function init() {
     state.leftNum = '';
     state.rightNum = '';
     state.operator = '';
     state.display = '';
     state.result = '';
 }
-
-logState()
