@@ -27,25 +27,33 @@ function setNumberTarget() {
 }
 
 function pressNumpadButton(type, value) {
+    // Pressing a digit after an operation starts in a fresh state.
+    if (state.result) {
+        init(state);
+    }
+
     const target = setNumberTarget();
     switch (type) {
         case 'digit': 
-            // Pressing a digit after an operation starts in a fresh state.
-            if (state.result) {
-                init(state);
-            }
-        
-            // Select target (leftNum, rightNum), append buttonString if target string is not too long, and update state.display
+            // Append digit value if target string is not too long, and update state.display
             if (state[target].length < 9) {
                 state[target] += value;
             }
             break;
 
-        case 'sign':
-            state[target] = String(0 - Number(state[target]))
+        case 'sign':   
+            state[target] = !state[target].includes('-') 
+                ? '-' + state[target]
+                : state[target].slice(1)
             break;
 
         case 'decimal': 
+            if (!state[target].includes('.')) {
+                if (state[target] === '') {
+                    state[target] += '0';
+                }
+                state[target] += '.';
+            }
             break;
     }
     state.display = state[target];
