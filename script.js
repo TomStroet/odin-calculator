@@ -1,10 +1,10 @@
 // Selectors
 const display = document.querySelector('.display')
+const numpad = document.querySelector('.numpad')
+const operators = document.querySelector('.operators');
 const clearBtn = document.querySelector('#clear')
 const backspaceBtn = document.querySelector('#backspace')
-const numpad = document.querySelector('.numpad')
-const operators = document.querySelectorAll('.operators button');
-const equalsBtn = document.querySelector('#equals')
+// const equalsBtn = document.querySelector('#equals')
 
 
 // State
@@ -51,7 +51,7 @@ function pressNumpadButton(type, value) {
             break;
 
         case 'sign':
-            state[target] = (0 - Number(state[target])).toString()
+            state[target] = String(0 - Number(state[target]))
             break;
 
         case 'decimal': 
@@ -90,7 +90,7 @@ function operate(state, operations) {
             state.result = 'div/0';
         } else {
             const operatorFn = operations[state.operator];
-            state.result = operatorFn(Number(state.leftNum), Number(state.rightNum)).toString();
+            state.result = String(operatorFn(Number(state.leftNum), Number(state.rightNum)));
         }
         
         logState()
@@ -128,18 +128,32 @@ numpad.addEventListener('click', (e) => {
     render();
 });
 
-operators.forEach((button) =>
-    button.addEventListener('click', (e) => {
-        operate(state, operations);
-        pressOperatorButton(state, e.target.id);
-        render();
-    })
-);
+operators.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
 
-equalsBtn.addEventListener('click', () => {
-    operate(state, operations)
-    render()
+    operate();
+    const operator = btn.dataset;
+    if (operator != 'operate') {
+        pressOperatorButton(operator);
+    }
+    render();
 })
+
+
+// operators.forEach((button) =>
+//     button.addEventListener('click', (e) => {
+        
+//         operate(state, operations);
+//         pressOperatorButton(state, e.target.id);
+//         render();
+//     })
+// );
+
+// equalsBtn.addEventListener('click', () => {
+//     operate(state, operations)
+//     render()
+// })
 
 clearBtn.addEventListener('click', () => {
     init(state)
