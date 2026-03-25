@@ -6,11 +6,12 @@ const controls = document.querySelector('.controls')
 
 // State
 const state = {
-    display: '',
-    operator: '',
     leftNum: '',
+    operator: '',
     rightNum: '',
-    result: ''
+    result: '',
+    display: '',
+    error: '',
 }
 
 // Utility functions
@@ -83,16 +84,19 @@ function operate() {
     if (state.leftNum && state.operator && state.rightNum) {
         // Check for divide-by-0. Else, choose operator function and run operation. Write result string to state.result.
         if (state.operator === 'divide' && state.rightNum === '0') {
-            state.result = 'div/0';
+            state.error = 'div/0';
+            state.display = state.error;
         } else {
             const operatorFn = operations[state.operator];
             state.result = String(operatorFn(Number(state.leftNum), Number(state.rightNum)));
+            
+            // Limit number of digits, then write result to display and clear other variables.
+            if (state.result.length > 9) {
+                state.result = state.result.slice(0, 9) + '...'            
+            }
         }
+
         
-        // Limit number of digits, then write result to display and clear other variables.
-        if (state.result.length > 9) {
-            state.result = state.result.slice(0, 9) + '...'            
-        }
         state.display = state.result
         state.leftNum = ''
         state.rightNum = ''
@@ -118,6 +122,7 @@ numpad.addEventListener('click', (e) => {
     const {type, value} = btn.dataset;
     pressNumpadButton(type, value);
     render();
+    logState();
 });
 
 operators.addEventListener('click', (e) => {
@@ -130,6 +135,7 @@ operators.addEventListener('click', (e) => {
         pressOperatorButton(operator);
     }
     render();
+    logState();
 })
 
 controls.addEventListener('click', (e) => {
@@ -146,6 +152,7 @@ controls.addEventListener('click', (e) => {
             break;    
     } 
     render();
+    logState();
 })
 
 // Initialization
