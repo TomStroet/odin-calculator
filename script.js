@@ -1,4 +1,5 @@
 // Selectors
+const body = document.querySelector('body')
 const display = document.querySelector('.display')
 const numpad = document.querySelector('.numpad')
 const operators = document.querySelector('.operators');
@@ -126,6 +127,7 @@ numpad.addEventListener('click', (e) => {
 
     const {type, value} = btn.dataset;
     pressNumpadButton(type, value);
+    btn.blur();
     render();
     logState();
 });
@@ -139,6 +141,7 @@ operators.addEventListener('click', (e) => {
     if (operator != 'operate') {
         pressOperatorButton(operator);
     }
+    btn.blur();
     render();
     logState();
 })
@@ -155,10 +158,46 @@ controls.addEventListener('click', (e) => {
         case 'clear':
             init();
             break;    
-    } 
+    }
+    btn.blur();
     render();
     logState();
 })
+
+body.addEventListener('keydown', (e) => {
+    console.log(e.key)
+    if (!isNaN(e.key)) {
+        pressNumpadButton('digit', e.key)
+    } else if (e.key === '.') {
+        pressNumpadButton('decimal', e.key)
+    } else if (['+', '-', '*', '/','=', 'Enter'].includes(e.key)) {
+        operate()
+        let operator = ''
+        switch (e.key) {
+            case '+':
+                operator = 'add';
+                break;
+            case '-':
+                operator = 'subtract';
+                break;
+            case '*':
+                operator = 'multiply';
+                break;
+            case '/':
+                operator = 'divide';
+                break;
+        }
+        pressOperatorButton(operator)
+    } else if (e.key === 'Delete' || e.key === 'Escape') {
+        init();
+    } else if (e.key === 'Backspace') {
+        pressBackspaceButton();
+    }
+    logState();
+    render();
+})
+
+
 
 // Initialization
 function init() {
