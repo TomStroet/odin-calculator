@@ -87,16 +87,21 @@ function operate() {
             state.error = 'div/0';
             state.display = state.error;
         } else {
+            // run operation and store result
             const operatorFn = operations[state.operator];
             state.result = String(operatorFn(Number(state.leftNum), Number(state.rightNum)));
             
-            // Limit number of digits, then write result to display and clear other variables.
+            // format result in case of more than 9 digits.
             if (state.result.length > 9) {
-                state.result = state.result.slice(0, 9) + '...'            
-            }
+                let resultSliced = state.result.slice(0, 9);
+                if (resultSliced.indexOf('.') === -1) {
+                    resultSliced += '...';
+                };
+                state.result = resultSliced;
+            };
         }
-
         
+        // push result to display and clear state variables.
         state.display = state.result
         state.leftNum = ''
         state.rightNum = ''
