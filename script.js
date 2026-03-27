@@ -33,7 +33,7 @@ function setNumberTarget() {
 
 function pressNumpadButton(type, value) {
     // Pressing a digit after an operation starts in a fresh state.
-    if (state.result) {
+    if (state.result || state.error) {
         init();
     }
 
@@ -73,7 +73,7 @@ function pressBackspaceButton() {
 
 function pressOperatorButton(operator) {
     // If there is a valid result (from equal-button or operator-button), then move result to leftNum.
-    if (state.result && !state.error) {
+    if (state.result) {
         state.leftNum = state.result;
         state.result = '';
     }
@@ -103,10 +103,12 @@ function operate() {
                 };
                 state.result = resultSliced;
             };
+
+            // push result to display
+            state.display = state.result
         }
         
-        // push result to display and clear state variables.
-        state.display = state.result
+        // Clear state variables.
         state.leftNum = ''
         state.rightNum = ''
         state.operator = ''
@@ -133,6 +135,7 @@ numpad.addEventListener('click', (e) => {
     pressNumpadButton(type, value);
     btn.blur();
     render();
+    logState()
 });
 
 operators.addEventListener('click', (e) => {
@@ -146,6 +149,7 @@ operators.addEventListener('click', (e) => {
     }
     btn.blur();
     render();
+    logState()
 })
 
 controls.addEventListener('click', (e) => {
