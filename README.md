@@ -8,4 +8,4 @@ Still to do:
 - ~~Add plus/minus button logic.~~
 - ~~Add 'divide by 0' check.~~
 ~~- Set operation result to right number of decimals.~~
-- Add keyboard support.
+~~- Add keyboard support.~~
