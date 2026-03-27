@@ -1,9 +1,9 @@
 // Selectors
-const body = document.querySelector('body')
 const display = document.querySelector('.display')
 const numpad = document.querySelector('.numpad')
 const operators = document.querySelector('.operators');
 const controls = document.querySelector('.controls')
+
 
 // State
 const state = {
@@ -15,6 +15,7 @@ const state = {
     error: '',
 }
 
+
 // Utility functions
 const operations = {
     add:      (a, b) =>  a + b,
@@ -23,15 +24,17 @@ const operations = {
     divide:   (a, b) =>  a / b,
 }
 
+
 // App logic
 function setNumberTarget() {
+    // return the target state variable based on whether operator is filled. Order is always left -> operator -> right.
     return state.operator ? 'rightNum' : 'leftNum';
 }
 
 function pressNumpadButton(type, value) {
     // Pressing a digit after an operation starts in a fresh state.
     if (state.result) {
-        init(state);
+        init();
     }
 
     const target = setNumberTarget();
@@ -70,7 +73,7 @@ function pressBackspaceButton() {
 
 function pressOperatorButton(operator) {
     // If there is a valid result (from equal-button or operator-button), then move result to leftNum.
-    if (state.result && state.result !== 'div/0') {
+    if (state.result && !state.error) {
         state.leftNum = state.result;
         state.result = '';
     }
@@ -120,6 +123,7 @@ function logState() {
     console.log(state)
 }
 
+
 // Event handlers
 numpad.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
@@ -129,7 +133,6 @@ numpad.addEventListener('click', (e) => {
     pressNumpadButton(type, value);
     btn.blur();
     render();
-    logState();
 });
 
 operators.addEventListener('click', (e) => {
@@ -138,12 +141,11 @@ operators.addEventListener('click', (e) => {
     
     operate();
     const operator = btn.dataset.type;
-    if (operator != 'operate') {
+    if (operator !== 'operate') {
         pressOperatorButton(operator);
     }
     btn.blur();
     render();
-    logState();
 })
 
 controls.addEventListener('click', (e) => {
@@ -161,42 +163,32 @@ controls.addEventListener('click', (e) => {
     }
     btn.blur();
     render();
-    logState();
 })
 
-body.addEventListener('keydown', (e) => {
-    console.log(e.key)
-    if (!isNaN(e.key)) {
+document.addEventListener('keydown', (e) => {
+    if (e.key >= '0' && e.key <= '9') {
         pressNumpadButton('digit', e.key)
     } else if (e.key === '.') {
         pressNumpadButton('decimal', e.key)
-    } else if (['+', '-', '*', '/','=', 'Enter'].includes(e.key)) {
+    } else if (['+', '-', '*', '/'].includes(e.key)) {
         operate()
         let operator = ''
         switch (e.key) {
-            case '+':
-                operator = 'add';
-                break;
-            case '-':
-                operator = 'subtract';
-                break;
-            case '*':
-                operator = 'multiply';
-                break;
-            case '/':
-                operator = 'divide';
-                break;
+            case '+': operator = 'add'; break;
+            case '-': operator = 'subtract'; break;
+            case '*': operator = 'multiply'; break;
+            case '/': operator = 'divide'; break;
         }
         pressOperatorButton(operator)
+    } else if (e.key === '=' || e.key === 'Enter') {
+        operate(); 
     } else if (e.key === 'Delete' || e.key === 'Escape') {
         init();
     } else if (e.key === 'Backspace') {
         pressBackspaceButton();
     }
-    logState();
     render();
 })
-
 
 
 // Initialization
@@ -206,4 +198,5 @@ function init() {
     state.operator = '';
     state.display = '';
     state.result = '';
+    state.error = '';
 }
